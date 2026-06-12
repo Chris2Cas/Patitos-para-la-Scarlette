@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 Patitos para la Scarlette 🦆</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --duck: #FFB800;
+    --duck-light: #FFF3CC;
+    --duck-dark: #CC8800;
+    --blush: #FF7BAC;
+    --blush-light: #FFE8F2;
+    --bg: #FFFBF4;
+    --card: #FFFFFF;
+    --locked-bg: #F5F0E8;
+    --locked-border: #E0D5C0;
+    --text: #1A1208;
+    --muted: #9A8870;
+    --shadow-sm: 0 2px 8px rgba(26,18,8,0.08);
+    --shadow-md: 0 6px 24px rgba(26,18,8,0.12);
+    --shadow-lg: 0 12px 40px rgba(26,18,8,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── LOADING OVERLAY ── */
+  #loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    gap: 1rem;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+  #loading-overlay .loading-duck {
+    font-size: 3rem;
+    animation: float 1.5s ease-in-out infinite;
+  }
+  #loading-overlay.hidden { display: none; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 4rem 1.5rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 30%, rgba(255,184,0,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 85% 70%, rgba(255,123,172,0.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .duck-float {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--duck-dark);
+  }
+
+  .subtitulo {
+    margin-top: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--duck), var(--blush));
+    margin: 1.5rem auto;
+    border-radius: 2px;
+  }
+
+  /* ── STATS BAR ── */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 1rem 1.5rem 2rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  .stats span strong {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .stats span { text-align: center; }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    padding: 0 1.2rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── CARD ── */
+  .card {
+    border-radius: 18px;
+    padding: 1.4rem;
+    position: relative;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    cursor: default;
+  }
+
+  .card.locked {
+    background: var(--locked-bg);
+    border: 1.5px solid var(--locked-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card.locked:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card.unlocked {
+    background: var(--card);
+    border: 1.5px solid rgba(255,184,0,0.3);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card.unlocked:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card.redeemed {
+    background: #F9F9F9;
+    border: 1.5px dashed #DDD;
+    box-shadow: none;
+    opacity: 0.6;
+  }
+
+  .num {
+    font-family: 'Fraunces', serif;
+    font-size: 0.7rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .card-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    display: block;
+    transition: transform 0.3s;
+  }
+
+  .card.unlocked:hover .card-icon { transform: scale(1.15) rotate(5deg); }
+
+  .locked-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #C0B090;
+    letter-spacing: 0.04em;
+  }
+
+  .locked-sub {
+    font-size: 0.75rem;
+    color: #C8BC9A;
+    margin-top: 0.3rem;
+    font-weight: 300;
+  }
+
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+    margin-bottom: 0;
+  }
+
+  .card.special-100 {
+    background: linear-gradient(135deg, #FFF8E0, #FFE8F2);
+    border: 2px solid var(--duck);
+    box-shadow: 0 8px 32px rgba(255,184,0,0.25);
+  }
+
+  .card.special-100 .card-title {
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .card.special-100 .card-title strong {
+    font-size: 1.15rem;
+    color: var(--duck-dark);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .redeemed-stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--blush);
+    border: 2px solid var(--blush);
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0.85;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-unlock {
+    background: var(--duck);
+    color: var(--text);
+  }
+  .btn-unlock:hover { background: var(--duck-dark); color: white; transform: scale(1.02); }
+
+  .btn-redeem {
+    background: none;
+    border: 1.5px solid #E0D0B0;
+    color: var(--muted);
+  }
+  .btn-redeem:hover { border-color: var(--blush); color: var(--blush); }
+
+  .btn-unredeem {
+    background: none;
+    border: 1.5px solid #DDD;
+    color: #BBB;
+    font-size: 0.72rem;
+  }
+  .btn-unredeem:hover { border-color: #999; color: #999; }
+
+  @keyframes pop {
+    0% { transform: scale(0.85); opacity: 0; }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .card.just-unlocked { animation: pop 0.4s cubic-bezier(.34,1.56,.64,1) both; }
+
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem 1rem 3rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  footer span { font-size: 1.1rem; }
+
+  @media (max-width: 500px) {
+    .grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; padding: 0 0.8rem 3rem; }
+    .card { padding: 1rem; }
+    .stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <span class="loading-duck">🦆</span>
+  <span>Cargando patitos...</span>
+</div>
+
+<div class="hero">
+  <span class="duck-float">🦆</span>
+  <h1>100 Patitos para<br><em>la Scarlette</em></h1>
+  <div class="divider"></div>
+  <p class="subtitulo">Cada patito es un canjeable, suerte encontrándolos todos amor mío ❤️‍🩹</p>
+</div>
+
+<div class="stats">
+  <span><strong id="stat-found">0</strong>encontrados</span>
+  <span><strong id="stat-unlocked">0</strong>desbloqueados</span>
+  <span><strong id="stat-redeemed">0</strong>canjeados</span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer><span>🦆</span> Hecho con amor · Solo para ti</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDD0WFa4Gwpe9nZxSvv95dNV4Mo0euU_O4",
+    authDomain: "patitos-para-scarlette.firebaseapp.com",
+    databaseURL: "https://patitos-para-scarlette-default-rtdb.firebaseio.com",
+    projectId: "patitos-para-scarlette",
+    storageBucket: "patitos-para-scarlette.firebasestorage.app",
+    messagingSenderId: "794708126175",
+    appId: "1:794708126175:web:ca1c5b196b84c13f92bc6a",
+    measurementId: "G-CF7XT9595Y"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const stateRef = ref(db, 'patitos/state');
+
+  const patitos = [
+    "Un beso cuando quieras",
+    "Desayuno en cama",
+    "Película a tu elección",
+    "El bajón qué quieras",
+    "Masaje de espalda completo",
+    "El día entero dándote atención y mucho cariño",
+    "Cena romántica en casa",
+    "Un día sin decirte que no",
+    "Jugamos a lo que tú quieras",
+    "Te preparo el baño",
+    "Vemos un video del goth que tú quieras",
+    "Una tarde sin celular",
+    "Preparo yo el almuerzo",
+    "Un día de spa casero",
+    "Completo XXXL (Baguette)",
+    "Salida sorpresa",
+    "Maratón de Anime corto",
+    "Noche de juegos de mesa y chelas",
+    "Hacer cita en casa con Canva",
+    "Abrazo largo cuando lo necesites",
+    "Hacer galletas New York",
+    "Ver película anime que tú quieras",
+    "Hacer un Podcast",
+    "Salida a la Quebrada de Macul",
+    "Salida al mall",
+    "Siesta juntos con regaloneo",
+    "Noche de pizza",
+    "Te cocino algo que nunca hice",
+    "Sesión de besitos bien ricos jeje",
+    "1 hora entera de hablar sin celular",
+    "Masaje de pies",
+    "1 hora sin hablar, solo con gestos",
+    "Sesión de fotos juntos",
+    "Escribir 3 cosas que admiras del otro y leerlas en voz alta",
+    "Un día de museo o exposición",
+    "Te consiento todo el día",
+    "Hacer un cortometraje con el celular en conjunto y VS",
+    "Tarde de conspiraciones y café",
+    "Te hago papitas en el momento que quieras",
+    "Un día de no hacer nada",
+    "Te llevo el desayuno a donde estés",
+    "Masaje relajante",
+    "Regaloneo ahora mismo ya jeje",
+    "Sesión de fotitos para ti fiu fiuuu (con el rey)",
+    "Un pacto secreto entre los dos",
+    "Vale por una guerra de almohadas",
+    "Una noche de karaoke en casa",
+    "Salida en barco patito",
+    "Regaloneo full con besitos jeje",
+    "Pintamos alguna prenda",
+    "Vamos por Mochis",
+    "Teleférico",
+    "Aprender algo nuevo juntos",
+    "Te preparo un picoteo para ver tele",
+    "Stand Up comedy",
+    "Recrear fotos random",
+    "Te escribo en el espejo",
+    "Ir a la feria a chachurear",
+    "Miramos fotos antiguas juntos",
+    "Un abrazo sorpresa por detrás",
+    "Tiempo de calidad cuando quieras",
+    "Salida a la playa",
+    "Hagamos alguna chanchada",
+    "Una promesa que eliges tú",
+    "Un viaje corto donde quieras ir",
+    "Hagamos algo que nunca hicimos",
+    "Abrazarnos por media hora",
+    "Que yo haga esa tarea que odias",
+    "Una noche sin agenda",
+    "Te arreglo algo en la casa",
+    "Hacer un Fanzine de nosotros",
+    "Un álbum de fotos nuestro",
+    "Vamos a tu lugar favorito",
+    "Picnic",
+    "Resuelvo algo que te tiene agobiada",
+    "Recreamos nuestra primera cita",
+    "Escribimos juntos nuestra lista de sueños",
+    "Día sin celular",
+    "Decoramos un espacio de la casa juntos",
+    "Aprendo algo contigo que tú ya sabes",
+    "Una noche de confesar cosas bonitas",
+    "Tú escribes el cupón número 100",
+    "Cupón por masaje",
+    "Hacerte papitas con cheddar",
+    "Ronda de besitoooos jejeje",
+    "Jugar lo que tú quieras por el tiempo que tú quieras",
+    "Te hago el desayuno que quieras",
+    "Nos cocinamos algo juntos desde cero",
+    "Te hago pastel de heladito (helado con galletitas y toppings) y le pondremos nombre juntos",
+    "Hacemos una lista de 10 lugares que queremos visitar",
+    "Ronda de besitoooos",
+    "Te hago un video de lo que quieras",
+    "Sesión de fotos para modelo Scarlette fiu fiuuu",
+    "Armamos un puzzle juntos",
+    "Ver una película de terror o la que quieras",
+    "Hacemos burritos (champiñón y Guacamole)",
+    "Vamos al museo que quieras o exposición",
+    "Ronda de besitos + sorpresa",
+    "Te invito unas pizzitas miamorsh",
+    null // patito especial 100
+  ];
+
+  let state = {};
+
+  function updateStats() {
+    const found = Object.values(state).filter(v => v !== 'locked').length;
+    const unlocked = Object.values(state).filter(v => v === 'unlocked').length;
+    const redeemed = Object.values(state).filter(v => v === 'redeemed').length;
+    document.getElementById('stat-found').textContent = found;
+    document.getElementById('stat-unlocked').textContent = unlocked;
+    document.getElementById('stat-redeemed').textContent = redeemed;
+  }
+
+  async function saveState() {
+    await set(stateRef, state);
+  }
+
+  function confetti(x, y) {
+    const colors = ['#FFB800','#FF7BAC','#FF3366','#FFD700','#FF9ECD','#FFF0A0'];
+    for (let i = 0; i < 18; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left: ${x + (Math.random()-0.5)*60}px;
+        top: ${y}px;
+        background: ${colors[Math.floor(Math.random()*colors.length)]};
+        animation-duration: ${0.8 + Math.random()*0.8}s;
+        animation-delay: ${Math.random()*0.2}s;
+        transform: rotate(${Math.random()*360}deg);
+        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1600);
+    }
+  }
+
+  function renderCard(i) {
+    const s = state[i];
+    const n = i + 1;
+    const card = document.getElementById('card-' + i);
+
+    if (i === 99) {
+      card.className = 'card ' + (s === 'locked' ? 'locked' : s === 'redeemed' ? 'redeemed special-100' : 'unlocked special-100');
+      if (s === 'locked') {
+        card.innerHTML = `
+          <div class="num">Patito #100</div>
+          <span class="card-icon">🔒</span>
+          <div class="locked-title">El patito más especial</div>
+          <div class="locked-sub">Este lo guardé para el final...</div>
+          <button class="btn btn-unlock" onclick="window._unlock(${i}, event)">🦆 Abrir</button>
+        `;
+      } else {
+        card.innerHTML = `
+          <div class="num">Patito #100 ⭐</div>
+          <span class="card-icon">🦆</span>
+          <div class="card-title">
+            <strong>Este último patito vale más...</strong>
+            porque te quiero decir el significado de por qué te estoy dando tantos patitos.<br><br>
+            Es porque te quiero <strong>PATO-DALAVIDA</strong> ❤️<br><br>
+            <em>TE AMO.</em>
+          </div>
+          ${s === 'redeemed' ? '<div class="redeemed-stamp">Canjeado ✓</div>' : ''}
+          ${s === 'unlocked' ? `<button class="btn btn-redeem" onclick="window._redeem(${i})">❤️ Marcar como canjeado</button>` : ''}
+          ${s === 'redeemed' ? `<button class="btn btn-unredeem" onclick="window._unredeem(${i})">↩ Desmarcar</button>` : ''}
+        `;
+      }
+      return;
+    }
+
+    const duck = s === 'locked' ? '🔒' : '🦆';
+    card.className = 'card ' + s;
+
+    if (s === 'locked') {
+      card.innerHTML = `
+        <div class="num">Patito #${String(n).padStart(3,'0')}</div>
+        <span class="card-icon">${duck}</span>
+        <div class="locked-title">???</div>
+        <div class="locked-sub">Encuéntrame primero 🦆</div>
+        <button class="btn btn-unlock" onclick="window._unlock(${i}, event)">🦆 ¡Lo encontré!</button>
+      `;
+    } else if (s === 'unlocked') {
+      card.innerHTML = `
+        <div class="num">Patito #${String(n).padStart(3,'0')}</div>
+        <span class="card-icon">🦆</span>
+        <div class="card-title">${patitos[i]}</div>
+        <button class="btn btn-redeem" onclick="window._redeem(${i})">✓ Canjear</button>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="num">Patito #${String(n).padStart(3,'0')}</div>
+        <span class="card-icon">🦆</span>
+        <div class="card-title">${patitos[i]}</div>
+        <div class="redeemed-stamp">Canjeado ✓</div>
+        <button class="btn btn-unredeem" onclick="window._unredeem(${i})">↩ Desmarcar</button>
+      `;
+    }
+  }
+
+  window._unlock = async function(i, evt) {
+    state[i] = 'unlocked';
+    await saveState();
+    const card = document.getElementById('card-' + i);
+    card.classList.add('just-unlocked');
+    setTimeout(() => card.classList.remove('just-unlocked'), 500);
+    const rect = card.getBoundingClientRect();
+    confetti(rect.left + rect.width/2, rect.top + rect.height/2);
+    renderCard(i);
+    updateStats();
+  };
+
+  window._redeem = async function(i) {
+    state[i] = 'redeemed';
+    await saveState();
+    renderCard(i);
+    updateStats();
+  };
+
+  window._unredeem = async function(i) {
+    state[i] = 'unlocked';
+    await saveState();
+    renderCard(i);
+    updateStats();
+  };
+
+  // Build grid
+  const grid = document.getElementById('grid');
+  for (let i = 0; i < 100; i++) {
+    const div = document.createElement('div');
+    div.id = 'card-' + i;
+    div.className = 'card locked';
+    grid.appendChild(div);
+  }
+
+  // Load state from Firebase
+  try {
+    const snapshot = await get(stateRef);
+    if (snapshot.exists()) {
+      state = snapshot.val();
+    }
+  } catch(e) {
+    console.warn('No se pudo cargar Firebase, usando estado vacío', e);
+  }
+
+  // Fill missing keys
+  for (let i = 0; i < 100; i++) {
+    if (!state[i]) state[i] = 'locked';
+  }
+
+  // Render all cards
+  for (let i = 0; i < 100; i++) renderCard(i);
+  updateStats();
+
+  // Hide loading
+  document.getElementById('loading-overlay').classList.add('hidden');
+</script>
+</body>
+</html>
